@@ -1,0 +1,311 @@
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ImageBackground,
+  TextInput,
+  StyleSheet,
+} from 'react-native';
+
+import {useTheme} from 'react-native-paper';
+
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Feather from 'react-native-vector-icons/Feather';
+
+import BottomSheet from 'reanimated-bottom-sheet';
+import Animated from 'react-native-reanimated';
+
+import ImagePicker from 'react-native-image-crop-picker';
+import { TapGestureHandler } from 'react-native-gesture-handler';
+
+const editSellerProfile = () => {
+
+  const [image, setImage] = useState('https://api.adorable.io/avatars/80/abott@adorable.png');
+  const {colors} = useTheme();
+
+  const bs = React.useRef(null);
+  const fall = new Animated.Value(1);
+
+  const takePhotoFromCamera = () => {
+    ImagePicker.openCamera({
+      compressImageMaxWidth: 300,
+      compressImageMaxHeight: 300,
+      cropping: true,
+      compressImageQuality: 0.7
+    }).then(image => {
+      console.log(image);
+      setImage(image.path);
+      bs.current.snapTo(1);
+    });
+  }
+
+  const choosePhotoFromLibrary = () => {
+      console.log("hello");
+    ImagePicker.openPicker({
+      width: 300,
+      height: 300,
+      cropping: true,
+      compressImageQuality: 0.7
+    }).then(image => {
+      console.log(image);
+      setImage(image.path);
+      bs.current.snapTo(1);
+    });
+  }
+
+  const renderInner = () => (
+    <View style={styles.panel}>
+      <View style={{alignItems: 'center'}}>
+        <Text style={styles.panelTitle}>Upload Photo</Text>
+        <Text style={styles.panelSubtitle}>Choose Your Profile Picture</Text>
+      </View>
+      <TouchableOpacity style={styles.button} onPress={takePhotoFromCamera}>
+        <Text style={styles.panelButtonTitle} >Take Photo</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} >
+        <Text style={styles.panelButtonTitle} onPress={() => { console.log("hello");}}>Choose From Library</Text>
+      </TouchableOpacity>
+      {/* <TapGestureHandler style={styles.button} onHandlerStateChange={() =>console.log('close triggered')}> */}
+      <TouchableOpacity onPress={() =>console.log('close triggered')}
+        style={styles.button}
+        >
+        <Text style={styles.panelButtonTitle} >Close</Text>
+      </TouchableOpacity>
+      {/* </TapGestureHandler> */}
+    </View>
+  );
+
+  const renderHeader = () => (
+    <View style={styles.header}>
+      <View style={styles.panelHeader}>
+        <View style={styles.panelHandle} />
+      </View>
+    </View>
+  );
+
+  
+
+  return (
+    <View style={styles.container}>
+      <BottomSheet
+        ref={bs}
+        snapPoints={[400, 0]}
+        renderContent={renderInner}
+        renderHeader={renderHeader}
+        initialSnap={1}
+        callbackNode={fall}
+        enabledGestureInteraction={true}
+      />
+      <Animated.View style={{margin: 20,
+        opacity: Animated.add(0.1, Animated.multiply(fall, 1.0)),}}>
+        <View style={{alignItems: 'center'}}>
+          <TouchableOpacity onPress={() => bs.current.snapTo(0)}>
+            <View
+              style={{
+                height: 100,
+                width: 100,
+                borderRadius: 15,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <ImageBackground
+                source={{
+                  uri: image,
+                }}
+                style={{height: 100, width: 100}}
+                imageStyle={{borderRadius: 15}}>
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Icon
+                    name="camera"
+                    size={35}
+                    color="#fff"
+                    style={{
+                      opacity: 0.7,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderWidth: 1,
+                      borderColor: '#fff',
+                      borderRadius: 10,
+                    }}
+                  />
+                </View>
+              </ImageBackground>
+            </View>
+          </TouchableOpacity>
+          <Text style={{marginTop: 10, fontSize: 18, fontWeight: 'bold', color:"#FFFFFF"}}>
+            yousra mashkoor
+          </Text>
+        </View>
+
+        <View style={styles.action}>
+          <Feather name="phone" color={colors.text} size={20} />
+          <TextInput
+            placeholder="Phone"
+            placeholderTextColor="#FFFFFF"
+            keyboardType="number-pad"
+            autoCorrect={false}
+            style={[
+              styles.textInput,
+              {
+                color: colors.text,
+              },
+            ]}
+          />
+        </View>
+        <View style={styles.action}>
+          <FontAwesome name="user" color={colors.text} size={20} />
+          <TextInput
+            placeholder="Skills"
+            placeholderTextColor="#FFFFFF"
+            keyboardType="email-address"
+            autoCorrect={false}
+            style={[
+              styles.textInput,
+              {
+                color: colors.text,
+              },
+            ]}
+          />
+        </View>
+        <View style={styles.action}>
+          <FontAwesome name="globe" color={colors.text} size={20} />
+          <TextInput
+            placeholder="Language"
+            placeholderTextColor="#FFFFFF"
+            autoCorrect={false}
+            style={[
+              styles.textInput,
+              {
+                color: colors.text,
+              },
+            ]}
+          />
+        </View>
+
+        <View style={styles.action}>
+          <Icon name="account" color={colors.text} size={20} />
+          <TextInput
+            placeholder="About me"
+            placeholderTextColor="#FFFFFF"
+            autoCorrect={false}
+            style={[
+              styles.textInput,
+              {
+                height: 100,
+                color: colors.text,
+              },
+            ]}
+          />
+        </View>
+
+        <TouchableOpacity style={styles.button} onPress={() => {}}>
+          <Text style={styles.panelButtonTitle}>Submit</Text>
+        </TouchableOpacity>
+      </Animated.View>
+    </View>
+  );
+};
+
+export default editSellerProfile;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginTop:20,
+    backgroundColor:'#3b444b'
+  },
+  commandButton: {
+    padding: 15,
+    borderRadius: 10,
+    backgroundColor: '#FF6347',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  panel: {
+    padding: 20,
+    backgroundColor: '#FFFFFF',
+    paddingTop: 20,
+  },
+  header: {
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#333333',
+    shadowOffset: {width: -1, height: -3},
+    shadowRadius: 2,
+    shadowOpacity: 0.4,
+    // elevation: 5,
+    paddingTop: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  panelHeader: {
+    alignItems: 'center',
+  },
+  panelHandle: {
+    width: 40,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#00000040',
+    marginBottom: 10,
+  },
+  panelTitle: {
+    fontSize: 27,
+    height: 35,
+  },
+  panelSubtitle: {
+    fontSize: 14,
+    color: 'gray',
+    height: 30,
+    marginBottom: 10,
+  },
+  panelButton: {
+    padding: 13,
+    borderRadius: 10,
+    backgroundColor: '#FF6347',
+    alignItems: 'center',
+    marginVertical: 7,
+  },
+  panelButtonTitle: {
+    fontSize: 20, fontWeight: 'bold', color: 'white' 
+  },
+  action: {
+    flexDirection: 'row',
+    marginTop: 10,
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f2f2f2',
+    paddingBottom: 5,
+  },
+  actionError: {
+    flexDirection: 'row',
+    marginTop: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#FF0000',
+    paddingBottom: 5,
+  },
+  textInput: {
+    flex: 1,
+    marginTop: Platform.OS === 'ios' ? 0 : -12,
+    paddingLeft: 10,
+    color: '#05375a',
+  },
+  button: {
+    backgroundColor: '#1F2833',
+    height: 70,
+    marginHorizontal: 20,
+    borderRadius: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 5,
+    shadowOffset: { width:2,height:2},
+    shadowColor:'black',
+    shadowOpacity:0.2,
+    elevation:3
+  },
+});
